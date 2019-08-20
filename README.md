@@ -11,11 +11,19 @@
      <li>1. SignUp </li>
       <li>2.SignIn</li>
       <li>3.Book Rides</li>
-      <li>4.Get Booking</li>
-      <li>4.Get Booking with date filter</li>
+      <li>4.Get Booked Rides</li>
+      <li>4.Get Booked Rides with date filter</li>
       </ul>
      </li>
-      <li>2. Admin Module
+      <li>2. Admin Module 
+        <ul>
+     <li>1. SignUp </li>
+      <li>2.SignIn</li>
+      <li>3.Book Rides</li>
+      <li>4.Get Booked Rides</li>
+      <li>4.Get Booked Rides with date filter</li>
+      </ul>
+     </li>
       <li>3. Driver Module
        <ul>
        <li>1. Notification </li>

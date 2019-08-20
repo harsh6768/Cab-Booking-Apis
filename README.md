@@ -28,8 +28,7 @@
       <li>3. Driver Module
        <ul>
        <li>1. SignUp </li>
-       <li>2. SignIn </li>
-       <li>2. Get all the bookings </li>   
+       <li>2. SignIn </li> 
        </ul>
    </li>
  </ul>

@@ -1,81 +1,126 @@
-var boom=require('boom');
-var db=require('../Model/sql.db');
+let  boom               =       require('boom');
+let db                  =       require('../Model/sql.db');
 
-function adminGetBookings(request,reply){
+let adminGetBookings=async(request,reply)=>{
 
 
-    var sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
+    let sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
     from bookings
     inner join users
     on bookings.users_fk=users.id`;
 
-    db.query(sql,function(err,bookings){
-       if(err) throw boom.boomify();
-       reply(bookings);
-    });
+   
+    db.queryAsync(sql)
+    .then(bookings=>reply({
 
+       status:200,
+       body:[bookings],
+       message:'Bookings detail'
+    }))
+    .catch(err=>reply(
+        {
+            status:500,
+            message:err.message
+        })
+    )
 }
 
-function adminGetBookingsWithUserId(request,reply){
+let adminGetBookingsWithUserId=async(request,reply)=>{
 
-     //console.log(request);
-     var userId=request.params.user_id;
-     //console.log(userId);
-     var sql=`select users.id,users.name,users.email,users.phone,booking.from_place,booking.to_place,booking.date_time
-        from booking 
+     let userId=request.params.user_id;
+     let sql=`select users.id,users.name,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+        from bookings
         inner join users 
-        on booking.users_fk=users.id 
-        AND booking.users_fk=?`;
+        on bookings.users_fk=users.id 
+        AND bookings.users_fk=?`;
  
-     db.query(sql,userId,function(err,bookings){
-         if(err) throw boom.boomify();
-         reply(bookings);
-     });
-
+    db.queryAsync(sql,userId)
+    .then(booking=>reply({
+        status:200,
+        body:booking,
+        message:'Booking details'
+    }))
+    .catch(err=>reply({
+        status:500,
+        body:err.message,
+        message:'Error occured!'
+    }))
 
 }
 
-function adminGetBookingsWithDateFilter(request,reply){
+let adminGetBookingsWithDateFilter=async(request,reply)=>{
 
-    var from_date=new Date(request.params.from_date);
-    var to_date=new Date(request.params.to_date);
+    let from_date=new Date(request.params.from_date);
+    let to_date=new Date(request.params.to_date);
 
-    var sql=`select users.id,users.email,users.phone,booking.from_place,booking.to_place,booking.date_time
-       from booking 
+    let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+       from bookings 
        inner join users 
-       on booking.users_fk=users.id 
-       AND booking.date_time>=? AND booking.date_time<=?`;
+       on bookings.users_fk=users.id 
+       AND bookings.date_time>=? AND bookings.date_time<=?`;
 
-    db.query(sql,[from_date,to_date],function(err,bookings){
-        if(err) throw boom.boomify();
-        reply(bookings)
-    })
+    db.queryAsync(sql,[from_date,to_date])
+    .then(bookings=>reply({
+        status:200,
+        body:[bookings],
+        message:'Bookings details'
+    }))  
+    .catch(err=>reply({
+        status:500,
+        body:err.message,
+        message:'Error error!'
+    }))
 
 }
 
-function getFreeDrivers(request,reply){
-    var freeDrivers=[];
+let getFreeDrivers=async(request,reply)=>{
+    let freeDrivers=[];
 
-    var sql='select * from drivers';
-    db.query(sql,function(err,drivers){
- 
-        if(err) throw boom.boomify();
-        for(var driver of drivers){
-            if(driver.status==1){
-                var freeDriver={
+    let sql='select * from drivers';
+    
+    db.queryAsync(sql)
+    .then(drivers=>{
 
-                }
-                freeDriver.id=driver.id;
-                freeDriver.name=driver.name;
-                freeDriver.email=driver.email;
-                freeDriver.address=driver.address;
-                freeDriver.status=driver.status;
-                freeDrivers.push(freeDriver);
-            }
-        }
-        reply(freeDrivers);
+        let driver=drivers.filter(driver=>driver.status===1);
+        freeDriver.id=driver.id;
+        freeDriver.name=driver.name;
+        freeDriver.email=driver.email;
+        freeDriver.address=driver.address;
+        freeDriver.status=driver.status;
+        freeDrivers.push(freeDriver);
+
+        reply({
+            status:200,
+            body:freeDrivers,
+            message:'Free drivers'
+        })
 
     })
+    .catch(err=>reply({
+        status:500,
+        body:[drivers],
+        message:'Driver details'
+    }))
+
+    // db.query(sql,function(err,drivers){
+ 
+    //     if(err) throw boom.boomify();
+    //     for(var driver of drivers){
+    //         if(driver.status==1){
+    //             var freeDriver={
+
+    //             }
+    //             freeDriver.id=driver.id;
+    //             freeDriver.name=driver.name;
+    //             freeDriver.email=driver.email;
+    //             freeDriver.address=driver.address;
+    //             freeDriver.status=driver.status;
+    //             freeDrivers.push(freeDriver);
+    //         }
+    //     }
+    //     reply(freeDrivers);
+
+    // })
 }
 
 function assignDrivers(request,reply){

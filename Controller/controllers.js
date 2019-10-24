@@ -224,10 +224,21 @@ let userGetBookings=(request,reply)=>{
      from bookings
      inner join users
      on bookings.users_fk=users.id`;
-     db.query(sql,function(err,bookings){
-        if(err) throw boom.boomify();
-        reply(bookings);
-     });
+     
+     db.queryAsync(sql)
+     .then(bookings=>reply({
+
+        status:200,
+        body:[bookings],
+        message:'Bookings detail'
+     }))
+     .catch(err=>reply(
+         {
+             status:500,
+             message:err.message
+         })
+     )
+     
      
 
 }
@@ -241,11 +252,17 @@ function userGetBookingWithId(request,reply){
        on bookings.users_fk=users.id 
        AND bookings.users_fk=?`;
 
-    db.query(sql,userId,(err,bookings)=>{
-        if(err) throw boom.boomify();
-        reply(bookings);
-    });
-
+    db.queryAsync(sql,userId)
+    .then(booking=>reply({
+        status:200,
+        body:booking,
+        message:'Booking details'
+    }))
+    .catch(err=>reply({
+        status:500,
+        body:err.message,
+        message:'Error occured!'
+    }))
 }
 
 let userBookingWithFilteredDate=(request,reply)=>{
@@ -260,10 +277,17 @@ let userBookingWithFilteredDate=(request,reply)=>{
        on bookings.users_fk=users.id 
        AND bookings.date_time>=? AND bookings.date_time<=?`;
 
-    db.query(sql,[from_date,to_date],function(err,bookings){
-        if(err) throw boom.boomify();
-        reply(bookings)
-    })
+    db.queryAsync(sql,[from_date,to_date])
+    .then(bookings=>reply({
+        status:200,
+        body:[bookings],
+        message:'Bookings details'
+    }))  
+    .catch(err=>reply({
+        status:500,
+        body:err.message,
+        message:'Error error!'
+    }))
     
 }
 

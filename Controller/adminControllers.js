@@ -4,10 +4,10 @@ var db=require('../Model/sql.db');
 function adminGetBookings(request,reply){
 
 
-    var sql=`select users.id,users.name,users.email,users.phone ,booking.from_place,booking.to_place,booking.date_time
-    from booking
+    var sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
+    from bookings
     inner join users
-    on booking.users_fk=users.id`;
+    on bookings.users_fk=users.id`;
 
     db.query(sql,function(err,bookings){
        if(err) throw boom.boomify();

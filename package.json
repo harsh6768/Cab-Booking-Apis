@@ -4,12 +4,15 @@
   "description": "",
   "main": "base.route.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^3.0.6",
+    "bluebird": "^3.7.1",
     "boom": "^7.3.0",
     "express-winston": "^3.3.0",
     "good": "^7.0.1",
@@ -32,5 +35,8 @@
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.0",
     "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
   }
 }

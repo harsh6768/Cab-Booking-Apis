@@ -1,99 +1,116 @@
-var bcrypt=require('bcrypt');
-var boom=require('boom');
-//var XMLHttpRequest=require('xmlhttprequest').XMLHttpRequest;
-var getAge=require('../Controller/dobToAgeConvert');
-var db=require('../Model/sql.db');
+const bcrypt              =       require('bcrypt');
+const boom                =       require('boom');
+const getAge              =       require('../Utilities/dobToAgeConvert');
+const db                  =       require('../Model/sql.db');
 
-function driverSignUp(request,reply){
+let driverSignUp=async(request,reply)=>{
 
+    const {
+        name,
+        email,
+        phone,
+        password,
+        dob,
+        address
+    }=request.payload;
 
-    var data=request.payload;
-    var name=data.name;
-    var email=data.email;
-    var mobileNo=(data.mobile_no).toString();
-    var password=data.password;
-    var dob=data.dob;
-    var address=data.address;
+    let age=getAge(dob);
+    let hashPassword=await bcrypt.hash(password,10);
 
-    //convert into dob to age
-    var age=getAge(dob);
-    //to encrypt the password
-    var hash=bcrypt.hashSync(password,10);
-
-    var count=0;
     //check whether driver with same phone number is exist or not
-    var sql1='select * from drivers';
-    db.query(sql1,function(err,drivers){
-         
-        for(var driver of drivers){
-            if(driver.phone==mobileNo){
-                count+=1;
-            }
-        }
-        //if user already 
-        //if mobile not present
-        if(count<1){
-            var sql='insert into drivers set ?';
-            var user={
-                name:name,email:email,phone:mobileNo,age:age,address:address,password:hash
-            }
-        
-            db.query(sql,user,function(err,result){
-                 
-                if(err) throw boom.boomify();
-               
-                reply({status:200,body:{name,email,mobileNo,hash},message:"SignUp successfully"});
-                
-            });
-        
-        }else{
-            reply({status:400,message:"Driver with this mobile number is already present"});
-        }
-    });
+    var sql='select * from drivers';
+    const drivers=await db.queryAsync(sql);
 
-}
+    //check if driver already exist
+    let driverArr=drivers.filter(driver=>driver.phone===phone);
 
-function driverSignIn(request,reply){
-
-
-    var data=request.payload;
-    var mobileNo=data.mobile_no;
-    var password=data.password;
+    if(driverArr.length<1){
      
-   var count=0;
-   var sql='select * from drivers';
-   db.query(sql,function(err,drivers){
-      
-       for(var driver of drivers){
+        let sql='insert into drivers set ?';
 
-           if(driver.phone==mobileNo){
+        let driver={
+            name,
+            email,
+            phone,
+            password:hashPassword,
+            age,
+            address
+        }
 
-            //to compare the password
-             bcrypt.compare(password,driver.password,function(err,resolve){
-                  
-                  if(resolve){
-                    reply({status:200,message:"Logged In successfully"});
-                  }else{
-                   reply({message:"Password is incorrect"})
-                  }
-                 
-             });
-           }
-           //reply({message:"Phone Number  is incorrect"})
-       }
-    
-   });
+        //insert the data 
+        db.queryAsync(sql,driver)
+        .then(driver=>{
+            reply({
+                status:200,
+                body:driver,
+                message:'Driver registered successfully!!!'
+            })
+        })
+        .catch(err=>{
+            reply({
+                status:500,
+                body:err.message,
+                message:'Internal server error'
+            })
+        })
 
+    }else{
+
+        reply({
+            status:400,
+            message:'Driver already exist with this phone number'
+        })
+
+    }
 
 }
 
-function driverConfirmRejectBookings(request,reply){
+let driverSignIn=async(request,reply)=>{
+
+    const {phone,password}=request.payload;
+     
+    let sql='select * from drivers';
+    let drivers=await db.queryAsync(sql);
+
+    //if user exist with phone number
+    let driver=drivers.filter(driver=>driver.phone==phone);
+    if(driver){
+
+        console.log(driver[0].password);
+        //check for password
+        const isLogin=await bcrypt.compare(password,driver[0].password);  //   return true/false
+        if(isLogin){
+
+           return reply({
+                status:200,
+                message:'Logged In successfully!!!'
+            })
+
+        }else{
+
+            reply({
+                status:400,
+                message:'Please enter valid password'
+            })
+        }
+
+    }else{
+        reply({
+            status:400,
+            message:'Please enter valid phone number'
+        })
+
+    }
+
+}
+
+let driverConfirmRejectBookings=async(request,reply)=>{
 
     
    //var api="https://maps.googleapis.com/maps/api/geocode/json?address=satna&key=AIzaSyAfZlz-TFPMkOjQJNNAGDqDdNeXS8KkZlM";
    
-//    const Http = new XMLHttpRequest();
-//    const url='https://jsonplaceholder.typicode.com/posts';
+//     const Http = new XMLHttpRequest();
+//     const url='https://jsonplaceholder.typicode.com/posts';
 //     Http.open("GET", url);
 //     Http.send();
 

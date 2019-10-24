@@ -4,19 +4,15 @@ var adminControllers=require('../Controller/adminControllers');
 
 var routes=[
     {
-        method: 'GET',
-        path: '/',
-        handler:controllers.defaultPage
-    },
-    {
         method:'POST',
         path:'/user/signup',
-        handler:controllers.userSignUp
+        handler:controllers.userSignUp,
     },
     {
         method:'POST',
         path:'/user/signin',
-        handler:controllers.userSignIn
+        handler:controllers.userSignIn,
+
     },
     {
         method:'POST',

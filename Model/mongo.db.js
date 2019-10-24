@@ -1,6 +1,6 @@
 var mongoose=require('mongoose');
 
-mongoose.connect('mongodb://localhost/usersDb');
+mongoose.connect('mongodb://localhost/usersDb',{ useNewUrlParser: true});
 
 let db=mongoose.connection;
 

@@ -1,15 +1,20 @@
-var MYSQL=require('mysql');
-//creating the mysql connection
-var db= MYSQL.createConnection({
+const Bluebird           =   require('bluebird');  
+const MYSQL             =   require('mysql');
+
+let con= MYSQL.createConnection({
     host:"localhost",
     user:"root",
-    password:"786Hh@786",
+    password:"",
     database:"uber_test",
 });
+
 //connecting the server
-db.connect(function(err){
+con.connect(function(err){
      if(err) throw err
      console.log("mysql connected to user")
 });
+
+//setting db as global variable
+global.db=Bluebird.promisifyAll(con);  //to convert callbacks to promise using bluebird
 
 module.exports=db;

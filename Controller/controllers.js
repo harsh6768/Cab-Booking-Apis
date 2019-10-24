@@ -160,7 +160,7 @@ let userCreateBooking=async(request,reply)=>{
         let user=users.filter(user=>user.phone==phone)[0]; //getting the first user
         
         if(user){
-            console.log(user);
+            // console.log(user);
             //setting the user id as foreign key
             bookingDetails.users_fk=user.id;
 
@@ -168,14 +168,28 @@ let userCreateBooking=async(request,reply)=>{
             let admin=await db.queryAsync(sql);
             //setting admin foreign_key
             bookingDetails.admin_fk=admin[0].id;
-
-            console.log(bookingDetails);
         
-            //insert booking details into the booking table
-            let sql1=`INSERT INTO bookings (from_place,to_place,date_time,geo_location,users_fk,admin_fk) values (${from_place},${to_place},${date_time},ST_GeomFromText('POINT(${lat} ${lng})'),${bookingDetails.users_fk},${bookingDetails.admin_fk})`;
-            let booking=await db.queryAsync(sql1);
-
-            if(booking){
+            // //insert booking details into the booking table
+            let sql1=`INSERT INTO bookings
+             (geo_location,
+                from_place,
+                to_place,
+                date_time,
+                users_fk,
+                admin_fk
+             )
+              values 
+              (
+                  ST_GeomFromText('POINT(${lat} ${lng})'),
+                  '${from_place}',
+                  '${to_place}',
+                  '${date_time}',
+                  ${bookingDetails.users_fk},
+                  ${bookingDetails.admin_fk}
+              )`;
+            
+            db.queryAsync(sql1)
+            .then(booking=>{
                 console.log(`-------------------------------`)
                 console.log(booking);
 
@@ -184,33 +198,14 @@ let userCreateBooking=async(request,reply)=>{
                     body:booking,
                     message:"Successfully created booking"
                 });
-            }else{
+            })
+            .catch(err=>{
+
                 reply({
                     status:500,
                     message:'internal server error'
                 })
-            }
-            // db.queryAsync(
-            //     sql1,
-            //     [from_place,to_place,date_time,phone,lat,lng,user.id,admin[0].id]
-            // )
-            // .then(booking=>{
-            //     console.log(`-------------------------------`)
-            //     console.log(booking);
-
-            //     reply({
-            //         status:200,
-            //         body:booking,
-            //         message:"Successfully created booking"
-            //     });
-            // })
-            // .catch(err=>{
-
-            //     reply({
-            //         status:500,
-            //         message:'internal server error'
-            //     })
-            // })
+            })
 
         }else{
 
@@ -221,95 +216,14 @@ let userCreateBooking=async(request,reply)=>{
         }
 
     }
-    // if(isValid){
-    //     //console.log(isValid);
-    //     let log=new Log({
-    //         id:id,
-    //         uri:uri,
-    //         end_point:end_point,
-    //         ip:ip,
-    //         method:method,
-    //         started_time:started_time,
-    //         created_time:created_time
-    //     })
-    //    //to save the data into the mongodb database
-    //     log.save(function(err,log){
-             
-    //         if(err) throw err;
-    //     });
-
-    //     let bookingDetails={
-    //         from_place,
-    //         to_place,
-    //         date_time:uDate,
-    //         users_fk:null,
-    //         admin_fk:null,
-
-    //     }
-    //     //checking is user is present or not
-    //     var sql1='select * from users';
-        
-    //     db.query(sql1,function(err,users){
-             
-    //         for(let user of users){
-                
-    //             if(user.phone==phone){
-                    
-    //                 bookingDetails.users_fk=user.id;
-    //                 let id=user.id;
-    //                 //if user not registered simply return the message 
-    //                 if(bookingDetails.users_fk!=null){
-            
-    //                     var adminSql='select * from admin';
-    //                     db.query(adminSql,function(err,admins){
- 
-    //                         for(let admin of admins){
-
-    //                             let admin_id=admin.id;
-    //                             bookingDetails.admin_fk=admin.id;
-                                
-                                // let sql="INSERT INTO booking (from_place,to_place,date_time,geo_location,users_fk,admin_fk) values (?,?,?,ST_GeomFromText('POINT(? ?)'),?,?)";
-                                // const query = db.query(sql,[fromPlace,toPlace,uDate,lat,lng,id,admin_id],function(err,resolve){
-                                //     if(resolve){
-                                        
-                                //         reply({status:200,body:bookingDetails,message:"Successfully created booking"});
-                                //         return;
-                                //     }
-                                //     else throw boom.boomify();
-                                // });
-    //                          }
-
-    //                     });
-    //                 }else{
-                        
-    //                     reply({status:400,message:"User not registered"});
-                    
-    //                 }
-    //             }
-                      
-    //         }
-        
-        
-    //  });
-
-    // }else{
-    //     let log=new Log({
-    //         id,uri,end_point,ip,method,started_time,created_time
-    //     })
-    //   //to save the data into the mongodb database
-    //     log.save();
-    //     reply({message:'Date or Time is invalid'});
-    // }
-      
 }
 let userGetBookings=(request,reply)=>{
     
-    //console.log(reply);
     
-    var sql=`select users.name,users.email,users.phone ,booking.from_place,booking.to_place,booking.date_time
-     from booking
+    var sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
+     from bookings
      inner join users
-     on booking.users_fk=users.id`;
+     on bookings.users_fk=users.id`;
      db.query(sql,function(err,bookings){
         if(err) throw boom.boomify();
         reply(bookings);
@@ -320,14 +234,12 @@ let userGetBookings=(request,reply)=>{
 
 function userGetBookingWithId(request,reply){
     
-    //console.log(request);
     let userId=request.params.user_id;
-    //console.log(userId);
-    let sql=`select users.id,users.email,users.phone,booking.from_place,booking.to_place,booking.date_time
-       from booking 
+    let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+       from bookings 
        inner join users 
-       on booking.users_fk=users.id 
-       AND booking.users_fk=?`;
+       on bookings.users_fk=users.id 
+       AND bookings.users_fk=?`;
 
     db.query(sql,userId,(err,bookings)=>{
         if(err) throw boom.boomify();
@@ -342,11 +254,11 @@ let userBookingWithFilteredDate=(request,reply)=>{
     let from_date=new Date(request.params.from_date);
     let to_date=new Date(request.params.to_date);
 
-    let sql=`select users.id,users.email,users.phone,booking.from_place,booking.to_place,booking.date_time
-       from booking 
+    let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+       from bookings 
        inner join users 
-       on booking.users_fk=users.id 
-       AND booking.date_time>=? AND booking.date_time<=?`;
+       on bookings.users_fk=users.id 
+       AND bookings.date_time>=? AND bookings.date_time<=?`;
 
     db.query(sql,[from_date,to_date],function(err,bookings){
         if(err) throw boom.boomify();

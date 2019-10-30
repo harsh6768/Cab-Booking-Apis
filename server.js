@@ -3,9 +3,6 @@ const routes            =       require("./Routes/routes");
 const admin             =       require("./Model/admin");
 const mongoDb           =       require("./Model/mongo.db");
 
-//env variable
-require('dotenv').config();
-
 // //for creating the admin
 admin.createAdmin();
 

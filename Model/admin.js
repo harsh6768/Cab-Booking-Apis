@@ -7,9 +7,9 @@ require('dotenv').config();
 
 var admin={
     name:process.env.ADMIN_NAME,
-    email:'admin@gmail.com',
-    phone:'9876543210',
-    password:'admin'
+    email:process.env.ADMIN_EMAIL,
+    phone:process.env.ADMIN_PHONE,
+    password:process.env.ADMIN_PASSWORD
 }
 var hash=bcrypt.hashSync(admin.password,10);
 admin.password=hash; 

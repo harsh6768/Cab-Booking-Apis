@@ -81,12 +81,13 @@ let getFreeDrivers=async(request,reply)=>{
     db.queryAsync(sql)
     .then(drivers=>{
 
+        //check if driver is free or not
         let driver=drivers.filter(driver=>driver.status===1);
-        freeDriver.id=driver.id;
-        freeDriver.name=driver.name;
-        freeDriver.email=driver.email;
-        freeDriver.address=driver.address;
-        freeDriver.status=driver.status;
+        freeDriver.id=driver[0].id;
+        freeDriver.name=driver[0].name;
+        freeDriver.email=driver[0].email;
+        freeDriver.address=driver[0].address;
+        freeDriver.status=driver[0].status;
         freeDrivers.push(freeDriver);
 
         reply({

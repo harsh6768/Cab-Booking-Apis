@@ -17,7 +17,6 @@ let userSignUp=async(request,reply)=>{
         password
     }=request.payload;
    
-    //console.log(mobileNo);
     //to encrypt the password
     let hash=bcrypt.hashSync(password,10);
 
@@ -28,8 +27,6 @@ let userSignUp=async(request,reply)=>{
     let userArr=users.filter(user=>{
         return user.phone===phone;
     });
-
-    // console.log(userArr);
 
     if(userArr.length<1){
      

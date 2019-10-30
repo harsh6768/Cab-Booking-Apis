@@ -1,10 +1,12 @@
 var db=require('./sql.db');
 var bcrypt=require('bcrypt');
+//env variable
+require('dotenv').config();
 
 //creating admin
 
 var admin={
-    name:'admin',
+    name:process.env.ADMIN_NAME,
     email:'admin@gmail.com',
     phone:'9876543210',
     password:'admin'

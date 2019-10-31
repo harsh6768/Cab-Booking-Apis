@@ -1,5 +1,5 @@
 const bcrypt              =       require('bcrypt');
-const boom                =       require('boom');
+const boom                =       require('@hapi/boom');
 const getAge              =       require('../Utilities/dobToAgeConvert');
 const db                  =       require('../Model/sql.db');
 

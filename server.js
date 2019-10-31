@@ -1,62 +1,53 @@
-const Hapi              =       require("hapi");
-const routes            =       require("./Routes/routes");
-const admin             =       require("./Model/admin");
-const mongoDb           =       require("./Model/mongo.db");
+const Hapi = require("@hapi/hapi");
+const Inert = require("@hapi/inert");
+const Good = require("@hapi/good");
+const Vision = require("@hapi/vision");
+const HapiSwagger = require("hapi-swagger");
+const routes = require("./Routes/routes");
+const admin = require("./Model/admin");
+const mongoDb = require("./Model/mongo.db");
 
 // //for creating the admin
 admin.createAdmin();
 
 const port = process.env.port || 3002;
-//to listen the request in localhost
-const server = new Hapi.Server();
 
-server.connection({
-  port: port,
-  host: "localhost",
-  routes: {
-    cors: true
-  }
-});
+const init = async () => {
+  const server = await new Hapi.Server({
+    host: "localhost",
+    port
+  });
 
-//server.register(logger);
-//for routes
-routes.forEach((route, index) => {
-  server.route(route);
-});
+  //swagger documentation options
+  const swaggerOptions = {
+    info: {
+      title: "Test API Documentation",
+      version: "0.0.1"
+    },
 
-server.register(
-  {
-    register: require("good"),
-    options: {
-      ops: {
-        interval: 10000
-      },
-      reporters: {
-        console: [
-          {
-            module: "good-squeeze",
-            name: "Squeeze",
-            args: [{ log: "*", response: "*", request: "*" }]
-          },
-          {
-            module: "good-console"
-          },
-          "stdout"
-        ]
-      }
+    grouping: "tags"
+  };
+
+  //register dependencies
+  await server.register([
+    Inert,
+    Vision,
+    Good,
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions
     }
-  },
-  function(err) {
-    if (err) {
-      console.log("error", "failed to install plugins");
-      throw err;
-    }
-    server.log("info", "plugins registered");
-  }
-);
+  ]);
 
-//to start the server
-server.start(function(err) {
-  if (err) throw err;
-  console.log("server running at " + server.info.uri);
-});
+  try {
+    await server.start();
+    console.log("Server running at:", server.info.uri);
+  } catch (err) {
+    console.log(err);
+  }
+
+  //routes
+  server.route(routes);
+};
+
+init();

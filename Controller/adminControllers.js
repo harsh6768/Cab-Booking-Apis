@@ -1,4 +1,4 @@
-let  boom               =       require('boom');
+let  boom               =       require('@hapi/boom');
 let db                  =       require('../Model/sql.db');
 
 let adminGetBookings=async(request,reply)=>{

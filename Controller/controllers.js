@@ -1,113 +1,139 @@
 const Bluebird              =   require('bluebird');
-const boom                  =   require('boom');
+const boom                  =   require('@hapi/boom');
 const db                    =   require('../Model/sql.db');
 const Log                   =   require('../Model/db.logs');
 const bcrypt                =   Bluebird.promisifyAll(require('bcrypt'));
 
 const validate=require('../Controller/validateDate'); //to validate the date
 
-let userSignUp=async(request,reply)=>{
+let userSignUp=(request,h)=>{
     
-    console.log(request.payload);
+    return new Promise((resolve,reject)=>{
+
+        console.log(request.payload);
     
-    const {
-        name,
-        email,
-        phone,
-        password
-    }=request.payload;
-   
-    //to encrypt the password
-    let hash=bcrypt.hashSync(password,10);
-
-    let sql='select * from users';
-    const users=await db.queryAsync(sql);
-
-    //check if user already exist
-    let userArr=users.filter(user=>{
-        return user.phone===phone;
-    });
-
-    if(userArr.length<1){
-     
-        let sql='insert into users set ?';
-
-        let user={
+        const {
             name,
             email,
             phone,
-            password:hash
-        }
+            password
+        }=request.payload;
+    
+        //to encrypt the password
+        let hash=bcrypt.hashSync(password,10);
 
-        //insert the data 
-        db.queryAsync(sql,user)
-        .then(user=>{
-            reply({
-                status:200,
-                body:user,
-                message:'User registered successfully!!!'
-            })
+        let sql='select * from users';
+        db.queryAsync(sql)
+        .then(users=>users.filter(user=>user.phone===phone))   //check if user already exist
+        .then(userArr=>{
+            
+            if(userArr.length<1){
+        
+                let sql='insert into users set ?';
+        
+                let user={
+                    name,
+                    email,
+                    phone,
+                    password:hash
+                }
+        
+                //insert the data 
+                db.queryAsync(sql,user)
+                .then(user=>{
+                    return resolve(
+                        h.response({
+                            status:200,
+                            body:user,
+                            message:'User registered successfully!!!'
+                        }).code(200)
+                    )
+                })
+                .catch(err=>{
+                    return reject(
+                        h.response({
+                            status:500,
+                            body:err.message,
+                            message:'Internal server error'
+                        }).code(500)
+                    )
+                })
+        
+            }else{
+        
+                return resolve(
+                    h.response({
+                        status:400,
+                        message:'User already exist with this phone number'
+                    })
+                )  
+        
+            }
+        
         })
-        .catch(err=>{
-            reply({
-                status:500,
-                body:err.message,
-                message:'Internal server error'
-            })
-        })
 
-    }else{
 
-        reply({
-            status:400,
-            message:'User already exist with this phone number'
-        })
-
-    }
-
+    })
+    
+    
 }
 
-let userSignIn=async(request,reply)=>{
+let userSignIn=(request,h)=>{
 
-    const {phone,password}=request.payload;
+    return new Promise((resolve,reject)=>{  //In latest version of hapi.js we need to return promise
+
+        const {phone,password}=request.payload;
      
-    let sql='select * from users';
-    let users=await db.queryAsync(sql);
+        let sql='select * from users';
+        db.queryAsync(sql)
+        .then(users=>users.filter(user=>user.phone===phone))   //if user exist with phone number
+        .then(user=>{
 
-    //if user exist with phone number
-    let user=users.filter(user=>user.phone==phone);
-    if(user){
+            if(user){
 
-        console.log(user[0].password);
-        //check for password
-        const isLogin=await bcrypt.compare(password,user[0].password);  //   return true/false
-        if(isLogin){
-
-           return reply({
-                status:200,
-                message:'Logged In successfully!!!'
-            })
-
-        }else{
-
-            reply({
-                status:400,
-                message:'Please enter valid password'
-            })
-        }
-
-    }else{
-        reply({
-            status:400,
-            body:boom.boomify(),
-            message:'Please enter valid phone number'
+                console.log(user[0].password);
+                //check for password
+                bcrypt.compare(password,user[0].password)  //return true/false
+                .then(isLogin=>{ //if password match 
+                    console.log(`----------------------->>>>>>>>>>>>>>`,isLogin);
+                    if(isLogin){
+        
+                        return resolve(
+                            h.response({
+                                status:200,
+                                message:'Logged In successfully!!!'
+                            })
+                        )
+            
+                    }else{
+            
+                        return resolve(
+                            h.response({
+                                status:400,
+                                message:'Please enter valid password'
+                            })
+                        ) 
+                    }
+            
+                })
+                
+            }else{
+                return resolve(
+                    h.response({
+                        status:400,
+                        body:boom.boomify(),
+                        message:'Please enter valid phone number'
+                    })
+                ) 
+            }
+        
         })
 
-    }
-
+    })
+    
 }
 
-let userCreateBooking=async(request,reply)=>{
+let userCreateBooking=(request,h)=>{
 
    // console.log(request.server.info);
   // console.log(request.server.info);
@@ -121,98 +147,165 @@ let userCreateBooking=async(request,reply)=>{
     let created_time=(request.server.info.created).toString();
     //console.log(request.info);
     //console.log(request.headers);
-    const {
+    return new Promise((resolve,reject)=>{
 
-        from_place,
-        to_place,
-        date_time,
-        phone,
-        location
+        const {
 
-    }=request.payload;
-
-    console.log(request.payload);
-    
-    let loc=location.split(',');
-    let lat=parseFloat(loc[0]);
-    let lng=parseFloat(loc[1]);
-    // //to validate the date
-    let isValidDate=validate(date_time);
-
-    if(isValidDate){
-
-        console.log(`...>>>>>>>>>>>>>>>>>>>>>>>${isValidDate}`);
-
-        let bookingDetails={
             from_place,
             to_place,
             date_time,
-            phone
-        }
-        //get user details so that we will know that which user is actaully booking the rides
-        let sql='select * from users';
-        let users=await db.queryAsync(sql);
-
-        //check if any user exist with provided phone number
-        let user=users.filter(user=>user.phone==phone)[0]; //getting the first user
+            phone,
+            location
+    
+        }=request.payload;
+    
+        console.log(request.payload);
         
-        if(user){
-            // console.log(user);
-            //setting the user id as foreign key
-            bookingDetails.users_fk=user.id;
-
-            let sql='select * from admin';
-            let admin=await db.queryAsync(sql);
-            //setting admin foreign_key
-            bookingDetails.admin_fk=admin[0].id;
-        
-            // //insert booking details into the booking table
-            let sql1=`INSERT INTO bookings
-             (geo_location,
+        let loc=location.split(',');
+        let lat=parseFloat(loc[0]);
+        let lng=parseFloat(loc[1]);
+        // //to validate the date
+        let isValidDate=validate(date_time);
+    
+        if(isValidDate){
+    
+            console.log(`...>>>>>>>>>>>>>>>>>>>>>>>${isValidDate}`);
+    
+            let bookingDetails={
                 from_place,
                 to_place,
                 date_time,
-                users_fk,
-                admin_fk
-             )
-              values 
-              (
-                  ST_GeomFromText('POINT(${lat} ${lng})'),
-                  '${from_place}',
-                  '${to_place}',
-                  '${date_time}',
-                  ${bookingDetails.users_fk},
-                  ${bookingDetails.admin_fk}
-              )`;
-            
-            db.queryAsync(sql1)
+                phone
+            }
+            //get user details so that we will know that which user is actaully booking the rides
+            let sql='select * from users';
+            db.queryAsync(sql)
+             //check if any user exist with provided phone number
+            .then(users=>users.filter(user=>user.phone===phone)[0]) //getting the first user
+            .then(user=>{
+                return new Promise((resolve,reject)=>{
+                    if(user){
+                        //setting the user id as foreign key
+                         bookingDetails.users_fk=user.id;  
+                         return resolve('select * from admin');    
+                    }else{
+    
+                        return resolve(
+                            h.response({
+                                status:400,
+                                message:'User does not exist '
+                            })
+                        ) 
+                    }
+                })
+                
+            })
+            .then(sql=>db.queryAsync(sql))  //get all admin
+            .then(admin=>{
+                return new Promise((resolve,reject)=>{
+                     //setting admin foreign_key
+                     bookingDetails.admin_fk=admin[0].id;
+                     resolve(
+                         // //insert booking details into the booking table
+                        `INSERT INTO bookings
+                        (geo_location,
+                        from_place,
+                        to_place,
+                        date_time,
+                        users_fk,
+                        admin_fk
+                        )
+                        values 
+                        (
+                            ST_GeomFromText('POINT(${lat} ${lng})'),
+                            '${from_place}',
+                            '${to_place}',
+                            '${date_time}',
+                            ${bookingDetails.users_fk},
+                            ${bookingDetails.admin_fk}
+                        )`
+                     )
+                })
+            })
+            .then(sql=>db.queryAsync(sql))   //insert into bookings table
             .then(booking=>{
-                console.log(`-------------------------------`)
-                console.log(booking);
-
-                reply({
+                return resolve(h.response({
                     status:200,
                     body:booking,
                     message:"Successfully created booking"
-                });
+                })
+                );
             })
             .catch(err=>{
-
-                reply({
-                    status:500,
-                    message:'internal server error'
-                })
-            })
-
-        }else{
-
-            reply({
-                status:400,
-                message:'User does not exist '
+                return resolve(
+                    h.response({
+                        status:500,
+                        message:'internal server error'
+                    })
+                ) 
             })
         }
+    })
+       
+    //     let user=users.filter(user=>user.phone==phone)[0]; 
+        
+    //     if(user){
+    //         // console.log(user);
+    //         //setting the user id as foreign key
+    //         bookingDetails.users_fk=user.id;
 
-    }
+    //         let sql='select * from admin';
+    //         let admin=await db.queryAsync(sql);
+    //         //setting admin foreign_key
+    //         bookingDetails.admin_fk=admin[0].id;
+        
+    //         // //insert booking details into the booking table
+    //         let sql1=`INSERT INTO bookings
+    //          (geo_location,
+    //             from_place,
+    //             to_place,
+    //             date_time,
+    //             users_fk,
+    //             admin_fk
+    //          )
+    //           values 
+    //           (
+    //               ST_GeomFromText('POINT(${lat} ${lng})'),
+    //               '${from_place}',
+    //               '${to_place}',
+    //               '${date_time}',
+    //               ${bookingDetails.users_fk},
+    //               ${bookingDetails.admin_fk}
+    //           )`;
+            
+    //         db.queryAsync(sql1)
+    //         .then(booking=>{
+    //             console.log(`-------------------------------`)
+    //             console.log(booking);
+
+    //             return h.response({
+    //                 status:200,
+    //                 body:booking,
+    //                 message:"Successfully created booking"
+    //             });
+    //         })
+    //         .catch(err=>{
+
+    //             return h.response({
+    //                 status:500,
+    //                 message:'internal server error'
+    //             })
+    //         })
+
+    //     }else{
+
+    //         return h.response({
+    //             status:400,
+    //             message:'User does not exist '
+    //         })
+    //     }
+
+    // }
 }
 let userGetBookings=(request,reply)=>{
     
@@ -223,20 +316,18 @@ let userGetBookings=(request,reply)=>{
      on bookings.users_fk=users.id`;
      
      db.queryAsync(sql)
-     .then(bookings=>reply({
+     .then(bookings=>h.response({
 
         status:200,
         body:[bookings],
         message:'Bookings detail'
      }))
-     .catch(err=>reply(
+     .catch(err=>h.response(
          {
              status:500,
              message:err.message
          })
-     )
-     
-     
+     )    
 
 }
 
@@ -250,16 +341,20 @@ function userGetBookingWithId(request,reply){
        AND bookings.users_fk=?`;
 
     db.queryAsync(sql,userId)
-    .then(booking=>reply({
-        status:200,
-        body:booking,
-        message:'Booking details'
-    }))
-    .catch(err=>reply({
-        status:500,
-        body:err.message,
-        message:'Error occured!'
-    }))
+    .then(booking=>{
+        return h.response({
+            status:200,
+            body:booking,
+            message:'Booking details'
+        })
+    })
+    .catch(err=>{
+       return h.response({
+            status:500,
+            body:err.message,
+            message:'Error occured!'
+       })
+    })
 }
 
 let userBookingWithFilteredDate=(request,reply)=>{
@@ -275,12 +370,12 @@ let userBookingWithFilteredDate=(request,reply)=>{
        AND bookings.date_time>=? AND bookings.date_time<=?`;
 
     db.queryAsync(sql,[from_date,to_date])
-    .then(bookings=>reply({
+    .then(bookings=>h.response({
         status:200,
         body:[bookings],
         message:'Bookings details'
     }))  
-    .catch(err=>reply({
+    .catch(err=>h.response({
         status:500,
         body:err.message,
         message:'Error error!'

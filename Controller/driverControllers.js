@@ -69,7 +69,7 @@ let driverSignUp=(request,h)=>{
                     h.response({
                         status:400,
                         message:'Driver already exist with this phone number'
-                    })
+                    }).code(400)
                 )  
             }
         
@@ -102,14 +102,14 @@ let driverSignIn=(request,h)=>{
                             h.response({
                                 status:200,
                                 message:'Logged In successfully!!!'
-                            })
+                            }).code(200)
                         )
                     }else{
                         return resolve(
                             h.response({
                                 status:400,
                                 message:'Please enter valid password'
-                            })
+                            }).code(400)
                         )
                     }
                 })
@@ -118,10 +118,9 @@ let driverSignIn=(request,h)=>{
                     h.response({
                     status:400,
                     message:'Please enter valid phone number'
-                   })
+                   }).code(400)
                 )
             }
-
         })
     })
 }

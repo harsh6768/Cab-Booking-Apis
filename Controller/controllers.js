@@ -64,13 +64,10 @@ let userSignUp=(request,h)=>{
                     h.response({
                         status:400,
                         message:'User already exist with this phone number'
-                    })
+                    }).code(400)
                 )  
-        
             }
-        
         })
-
 
     })
     
@@ -101,7 +98,7 @@ let userSignIn=(request,h)=>{
                             h.response({
                                 status:200,
                                 message:'Logged In successfully!!!'
-                            })
+                            }).code(200)
                         )
             
                     }else{
@@ -110,7 +107,7 @@ let userSignIn=(request,h)=>{
                             h.response({
                                 status:400,
                                 message:'Please enter valid password'
-                            })
+                            }).code(400)
                         ) 
                     }
             
@@ -122,7 +119,7 @@ let userSignIn=(request,h)=>{
                         status:400,
                         body:boom.boomify(),
                         message:'Please enter valid phone number'
-                    })
+                    }).code(400)
                 ) 
             }
         
@@ -220,14 +217,14 @@ let userCreateBooking=(request,h)=>{
                     body:booking,
                     message:"Successfully created booking"
     
-                }))
+                })).code(200)
             )
             .catch(err=>reject(
                 h.response({
                     status:400,
                     body:err,
                     message:'Error occured!'
-                })
+                }).code(400)
             ))
 
         }else{
@@ -236,7 +233,7 @@ let userCreateBooking=(request,h)=>{
                 h.response({
                     status:400,
                     body:'Date is invalid.'
-                })
+                }).code(400)
             )
         }
     })
@@ -253,14 +250,15 @@ let userGetBookings=(request,h)=>{
      
      db.queryAsync(sql)
      .then(bookings=>h.response({
-        status:200,
-        body:[bookings],
-        message:'Bookings detail'
-     }))
+            status:200,
+            body:[bookings],
+            message:'Bookings detail'
+       }).code(200)
+     )
      .catch(err=>h.response({
              status:500,
              message:err.message
-         })
+         }).code(500)
      )    
 
 }
@@ -280,14 +278,14 @@ let userGetBookingWithId=(request,h)=>{
             status:200,
             body:booking,
             message:'Booking details'
-        })
+        }).code(200)
     })
     .catch(err=>{
        return h.response({
             status:500,
             body:err.message,
             message:'Error occured!'
-       })
+       }).code(500)
     })
 }
 
@@ -305,15 +303,17 @@ let userBookingWithFilteredDate=(request,h)=>{
 
     db.queryAsync(sql,[from_date,to_date])
     .then(bookings=>h.response({
-        status:200,
-        body:[bookings],
-        message:'Bookings details'
-    }))  
+            status:200,
+            body:[bookings],
+            message:'Bookings details'
+     }).code(200)
+    )  
     .catch(err=>h.response({
         status:500,
         body:err.message,
         message:'Error error!'
-    }))
+    }).code(500)
+    )
     
 }
 

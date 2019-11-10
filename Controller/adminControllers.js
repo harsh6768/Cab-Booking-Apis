@@ -16,13 +16,13 @@ let adminGetBookings=(request,h)=>{
                 status:200,
                 body:[bookings],
                 message:'Bookings detail'
-            })
+            }).code(200)
         ))
         .catch(err=>reject(
             h.response({
                 status:500,
                 message:err.message
-            })
+            }).code(500)
         ))
 
     })
@@ -42,17 +42,17 @@ let adminGetBookingsWithUserId=(request,h)=>{
         db.queryAsync(sql,userId)
         .then(booking=>resolve(
             h.response({
-            status:200,
-            body:booking,
-            message:'Booking details'
-           })
+                status:200,
+                body:booking,
+                message:'Booking details'
+           }).code(200)
         ))
         .catch(err=>reject(
             h.response({
                 status:500,
                 body:err.message,
                 message:'Error occured!'
-            })
+            }).code(500)
         ))
     })
 
@@ -77,14 +77,14 @@ let adminGetBookingsWithDateFilter=(request,h)=>{
                 status:200,
                 body:[bookings],
                 message:'Bookings details'
-            })
+            }).code(200)
         ))  
         .catch(err=>reject(
             h.response({
                 status:500,
                 body:err.message,
                 message:'Error error!'
-            })
+            }).code(500)
         ))
     })
     // let from_date=new Date(request.params.from_date);
@@ -133,7 +133,7 @@ let getFreeDrivers=async(request,h)=>{
                     status:200,
                     body:freeDrivers,
                     message:'Free drivers'
-                })
+                }).code(200)
             )
         })
         .catch(err=>reject(
@@ -141,7 +141,7 @@ let getFreeDrivers=async(request,h)=>{
                 status:500,
                 body:[drivers],
                 message:'Driver details'
-            })
+            }).code(500)
         ))
 
     })

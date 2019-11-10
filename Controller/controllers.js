@@ -3,8 +3,7 @@ const boom                  =   require('boom');
 const db                    =   require('../Model/sql.db');
 const Log                   =   require('../Model/db.logs');
 const bcrypt                =   Bluebird.promisifyAll(require('bcrypt'));
-
-const validate=require('../Controller/validateDate'); //to validate the date
+const validate              =   require('../Controller/validateDate'); //to validate the date
 
 let userSignUp=async(request,reply)=>{
     
@@ -235,8 +234,6 @@ let userGetBookings=(request,reply)=>{
              message:err.message
          })
      )
-     
-     
 
 }
 

@@ -3,7 +3,6 @@ const Inert                       =       require("@hapi/inert");
 const Good                        =       require("@hapi/good");
 const Vision                      =       require("@hapi/vision");
 const HapiSwagger                 =       require("hapi-swagger");
-const routes                      =       require("./Routes/routes");
 const admin                       =       require("./Model/admin");
 const mongoDb                     =       require("./Model/mongo.db");
 
@@ -39,6 +38,17 @@ const init = async () => {
     }
   ]);
 
+  await server.register(
+    {
+      plugin:require('./Routes/routes')
+    },
+    {
+      routes:{prefix:'/api'}
+    },
+    (err)=>{
+      if(err){throw err }
+    }
+  )
   try {
     await server.start();
     console.log("Server running at:", server.info.uri);
@@ -46,8 +56,6 @@ const init = async () => {
     console.log(err);
   }
 
-  //routes
-  server.route(routes);
 };
 
 init();

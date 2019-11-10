@@ -1,7 +1,8 @@
 
-function validate(userDate){
+let validate=(userDate)=>{
 
-    var arr=userDate.split('T');
+    console.log(userDate)
+    var arr=userDate.split(' ')||[];
     var date=arr[0];
     var time=arr[1];
     var uDate=date.split('-')||date.split('/');

@@ -4,7 +4,7 @@ const db                    =   require('../Model/sql.db');
 const Log                   =   require('../Model/db.logs');
 const bcrypt                =   Bluebird.promisifyAll(require('bcrypt'));
 
-const validate=require('../Controller/validateDate'); //to validate the date
+let validate=require('../Controller/validateDate') //to validate the date
 
 let userSignUp=(request,h)=>{
     
@@ -147,28 +147,25 @@ let userCreateBooking=(request,h)=>{
     let created_time=(request.server.info.created).toString();
     //console.log(request.info);
     //console.log(request.headers);
+
+    const{
+        from_place,
+        to_place,
+        date_time,
+        phone,
+        location
+    }=request.payload;
+
     return new Promise((resolve,reject)=>{
-
-        const {
-
-            from_place,
-            to_place,
-            date_time,
-            phone,
-            location
-    
-        }=request.payload;
-    
-        console.log(request.payload);
         
         let loc=location.split(',');
         let lat=parseFloat(loc[0]);
         let lng=parseFloat(loc[1]);
+    
         // //to validate the date
         let isValidDate=validate(date_time);
-    
         if(isValidDate){
-    
+            
             console.log(`...>>>>>>>>>>>>>>>>>>>>>>>${isValidDate}`);
     
             let bookingDetails={
@@ -177,137 +174,76 @@ let userCreateBooking=(request,h)=>{
                 date_time,
                 phone
             }
+
             //get user details so that we will know that which user is actaully booking the rides
             let sql='select * from users';
             db.queryAsync(sql)
              //check if any user exist with provided phone number
             .then(users=>users.filter(user=>user.phone===phone)[0]) //getting the first user
             .then(user=>{
-                return new Promise((resolve,reject)=>{
                     if(user){
                         //setting the user id as foreign key
                          bookingDetails.users_fk=user.id;  
-                         return resolve('select * from admin');    
-                    }else{
-    
-                        return resolve(
-                            h.response({
-                                status:400,
-                                message:'User does not exist '
-                            })
-                        ) 
+                         return ('select * from admin');    
                     }
-                })
-                
             })
-            .then(sql=>db.queryAsync(sql))  //get all admin
-            .then(admin=>{
-                return new Promise((resolve,reject)=>{
-                     //setting admin foreign_key
-                     bookingDetails.admin_fk=admin[0].id;
-                     resolve(
-                         // //insert booking details into the booking table
-                        `INSERT INTO bookings
-                        (geo_location,
+            .then(adminQuery=>db.queryAsync(adminQuery))  //To get admin
+            .then(admins=>{
+                 //setting admin foreign_key
+                 bookingDetails.admin_fk=admins[0].id;
+                 //insert booking details into the booking table
+                return `INSERT INTO bookings
+                    (
+                        geo_location,
                         from_place,
                         to_place,
                         date_time,
                         users_fk,
                         admin_fk
-                        )
-                        values 
-                        (
-                            ST_GeomFromText('POINT(${lat} ${lng})'),
-                            '${from_place}',
-                            '${to_place}',
-                            '${date_time}',
-                            ${bookingDetails.users_fk},
-                            ${bookingDetails.admin_fk}
-                        )`
-                     )
-                })
+                    )
+                    values 
+                    (
+                        ST_GeomFromText('POINT(${lat} ${lng})'),
+                        '${from_place}',
+                        '${to_place}',
+                        '${date_time}',
+                        ${bookingDetails.users_fk},
+                        ${bookingDetails.admin_fk}
+                    )`;
+        
             })
-            .then(sql=>db.queryAsync(sql))   //insert into bookings table
-            .then(booking=>{
-                return resolve(h.response({
+            .then(bookingQuery=>db.queryAsync(bookingQuery)) //insert booking in booking table
+            .then(booking=>resolve(
+                h.response({
+               
                     status:200,
                     body:booking,
                     message:"Successfully created booking"
+    
+                }))
+            )
+            .catch(err=>reject(
+                h.response({
+                    status:400,
+                    body:err,
+                    message:'Error occured!'
                 })
-                );
-            })
-            .catch(err=>{
-                return resolve(
-                    h.response({
-                        status:500,
-                        message:'internal server error'
-                    })
-                ) 
-            })
+            ))
+
+        }else{
+
+            return reject(
+                h.response({
+                    status:400,
+                    body:'Date is invalid.'
+                })
+            )
         }
     })
-       
-    //     let user=users.filter(user=>user.phone==phone)[0]; 
-        
-    //     if(user){
-    //         // console.log(user);
-    //         //setting the user id as foreign key
-    //         bookingDetails.users_fk=user.id;
 
-    //         let sql='select * from admin';
-    //         let admin=await db.queryAsync(sql);
-    //         //setting admin foreign_key
-    //         bookingDetails.admin_fk=admin[0].id;
-        
-    //         // //insert booking details into the booking table
-    //         let sql1=`INSERT INTO bookings
-    //          (geo_location,
-    //             from_place,
-    //             to_place,
-    //             date_time,
-    //             users_fk,
-    //             admin_fk
-    //          )
-    //           values 
-    //           (
-    //               ST_GeomFromText('POINT(${lat} ${lng})'),
-    //               '${from_place}',
-    //               '${to_place}',
-    //               '${date_time}',
-    //               ${bookingDetails.users_fk},
-    //               ${bookingDetails.admin_fk}
-    //           )`;
-            
-    //         db.queryAsync(sql1)
-    //         .then(booking=>{
-    //             console.log(`-------------------------------`)
-    //             console.log(booking);
-
-    //             return h.response({
-    //                 status:200,
-    //                 body:booking,
-    //                 message:"Successfully created booking"
-    //             });
-    //         })
-    //         .catch(err=>{
-
-    //             return h.response({
-    //                 status:500,
-    //                 message:'internal server error'
-    //             })
-    //         })
-
-    //     }else{
-
-    //         return h.response({
-    //             status:400,
-    //             message:'User does not exist '
-    //         })
-    //     }
-
-    // }
 }
-let userGetBookings=(request,reply)=>{
+
+let userGetBookings=(request,h)=>{
     
     
     var sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
@@ -317,13 +253,11 @@ let userGetBookings=(request,reply)=>{
      
      db.queryAsync(sql)
      .then(bookings=>h.response({
-
         status:200,
         body:[bookings],
         message:'Bookings detail'
      }))
-     .catch(err=>h.response(
-         {
+     .catch(err=>h.response({
              status:500,
              message:err.message
          })
@@ -331,7 +265,7 @@ let userGetBookings=(request,reply)=>{
 
 }
 
-function userGetBookingWithId(request,reply){
+let userGetBookingWithId=(request,h)=>{
     
     let userId=request.params.user_id;
     let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
@@ -357,7 +291,7 @@ function userGetBookingWithId(request,reply){
     })
 }
 
-let userBookingWithFilteredDate=(request,reply)=>{
+let userBookingWithFilteredDate=(request,h)=>{
    
     
     let from_date=new Date(request.params.from_date);

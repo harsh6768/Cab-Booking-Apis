@@ -1,11 +1,11 @@
-const Hapi = require("@hapi/hapi");
-const Inert = require("@hapi/inert");
-const Good = require("@hapi/good");
-const Vision = require("@hapi/vision");
-const HapiSwagger = require("hapi-swagger");
-const routes = require("./Routes/routes");
-const admin = require("./Model/admin");
-const mongoDb = require("./Model/mongo.db");
+const Hapi                        =       require('@hapi/hapi');
+const Inert                       =       require("@hapi/inert");
+const Good                        =       require("@hapi/good");
+const Vision                      =       require("@hapi/vision");
+const HapiSwagger                 =       require("hapi-swagger");
+const routes                      =       require("./Routes/routes");
+const admin                       =       require("./Model/admin");
+const mongoDb                     =       require("./Model/mongo.db");
 
 // //for creating the admin
 admin.createAdmin();

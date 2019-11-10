@@ -186,6 +186,7 @@ let userCreateBooking=(request,h)=>{
                          bookingDetails.users_fk=user.id;  
                          return ('select * from admin');    
                     }
+                    // throw 'User with this Phone number is not exist!'
             })
             .then(adminQuery=>db.queryAsync(adminQuery))  //To get admin
             .then(admins=>{

@@ -1,107 +1,129 @@
-const bcrypt              =       require('bcrypt');
+const Bluebird            =       require('bluebird')
+const bcrypt              =       Bluebird.promisifyAll(require('bcrypt'));
 const boom                =       require('@hapi/boom');
 const getAge              =       require('../Utilities/dobToAgeConvert');
 const db                  =       require('../Model/sql.db');
 
-let driverSignUp=async(request,reply)=>{
+let driverSignUp=(request,h)=>{
 
-    const {
-        name,
-        email,
-        phone,
-        password,
-        dob,
-        address
-    }=request.payload;
+    return new Promise((resolve,reject)=>{
 
-    let age=getAge(dob);
-    let hashPassword=await bcrypt.hash(password,10);
-
-    //check whether driver with same phone number is exist or not
-    var sql='select * from drivers';
-    const drivers=await db.queryAsync(sql);
-
-    //check if driver already exist
-    let driverArr=drivers.filter(driver=>driver.phone===phone);
-
-    if(driverArr.length<1){
-     
-        let sql='insert into drivers set ?';
-
-        let driver={
+        console.log(request.payload);
+    
+        const {
             name,
             email,
             phone,
-            password:hashPassword,
-            age,
+            password,
+            dob,
             address
-        }
+        }=request.payload;
+    
+        let age=getAge(dob);
+        //to encrypt the password
+        let hash=bcrypt.hashSync(password,10);
 
-        //insert the data 
-        db.queryAsync(sql,driver)
-        .then(driver=>{
-            reply({
-                status:200,
-                body:driver,
-                message:'Driver registered successfully!!!'
-            })
+        let sql='select * from drivers';
+        db.queryAsync(sql)
+        //check if driver already exist
+        .then(drivers=>drivers.filter(driver=>driver.phone===phone))   //check if user already exist
+        .then(driverArr=>{
+            
+            if(driverArr.length<1){
+        
+                let sql='insert into drivers set ?';
+        
+                let driver={
+                    name,
+                    email,
+                    phone,
+                    password:hash,
+                    age,
+                    address
+                }
+        
+                //insert the data 
+                db.queryAsync(sql,driver)
+                .then(user=>{
+                    return resolve(
+                        h.response({
+                            status:200,
+                            body:user,
+                            message:'Driver registered successfully!!!'
+                        }).code(200)
+                    )
+                })
+                .catch(err=>{
+                    return reject(
+                        h.response({
+                            status:500,
+                            body:err.message,
+                            message:'Internal server error'
+                        }).code(500)
+                    )
+                })
+        
+            }else{
+        
+                return resolve(
+                    h.response({
+                        status:400,
+                        message:'Driver already exist with this phone number'
+                    })
+                )  
+            }
+        
         })
-        .catch(err=>{
-            reply({
-                status:500,
-                body:err.message,
-                message:'Internal server error'
-            })
-        })
-
-    }else{
-
-        reply({
-            status:400,
-            message:'Driver already exist with this phone number'
-        })
-
-    }
-
+    })
+    
 }
 
-let driverSignIn=async(request,reply)=>{
+let driverSignIn=(request,h)=>{
 
-    const {phone,password}=request.payload;
-     
-    let sql='select * from drivers';
-    let drivers=await db.queryAsync(sql);
+    return new Promise((resolve,reject)=>{
 
-    //if user exist with phone number
-    let driver=drivers.filter(driver=>driver.phone==phone);
-    if(driver){
+        const {
+            phone,
+            password
+        }=request.payload;
 
-        console.log(driver[0].password);
-        //check for password
-        const isLogin=await bcrypt.compare(password,driver[0].password);  //   return true/false
-        if(isLogin){
+        let sql='select * from drivers';
+        db.queryAsync(sql)
+        .then(drivers=>drivers.filter(driver=>driver.phone==phone))
+        .then(drivers=>{
 
-           return reply({
-                status:200,
-                message:'Logged In successfully!!!'
-            })
+            console.log(drivers)
+            if(drivers.length>0){
 
-        }else{
+                bcrypt.compare(password,drivers[0].password)
+                .then(isLogin=>{
+                    if(isLogin){
+                       return resolve(
+                            h.response({
+                                status:200,
+                                message:'Logged In successfully!!!'
+                            })
+                        )
+                    }else{
+                        return resolve(
+                            h.response({
+                                status:400,
+                                message:'Please enter valid password'
+                            })
+                        )
+                    }
+                })
+            }else{
+                return resolve(
+                    h.response({
+                    status:400,
+                    message:'Please enter valid phone number'
+                   })
+                )
+            }
 
-            reply({
-                status:400,
-                message:'Please enter valid password'
-            })
-        }
-
-    }else{
-        reply({
-            status:400,
-            message:'Please enter valid phone number'
         })
-
-    }
-
+    })
 }
 
 let driverConfirmRejectBookings=async(request,reply)=>{

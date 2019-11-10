@@ -3,8 +3,7 @@ const boom                  =   require('@hapi/boom');
 const db                    =   require('../Model/sql.db');
 const Log                   =   require('../Model/db.logs');
 const bcrypt                =   Bluebird.promisifyAll(require('bcrypt'));
-
-let validate=require('../Controller/validateDate') //to validate the date
+const validate              =   require('../Controller/validateDate') //to validate the date
 
 let userSignUp=(request,h)=>{
     

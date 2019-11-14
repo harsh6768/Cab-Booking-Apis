@@ -9,98 +9,128 @@ exports.plugin={
             method:'POST',
             path:'/user/signup',
             options:{
+                description:'User SignUp Api',
+                notes:'signup with valid phone number',
                 handler:controllers.userSignUp,
+                tags:['api']
             }
         }),
         server.route({
             method:'POST',
             path:'/user/signin',
             options:{
+                 description:'User SignIn Api',
+                 notes:'provide valid credentials',
                  handler:controllers.userSignIn,
+                 tags:['api']
             }
         }),
         server.route({
             method:'POST',
             path:'/user/createBooking',
             options:{
-                 handler:controllers.userCreateBooking
+                 description:'Create Booking Api',
+                 handler:controllers.userCreateBooking,
+                 tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/user/getBookings',
             options:{
+                description:'Get All Booking Details Api',
                 handler:controllers.userGetBookings,
+                tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/user/getBooking/{user_id}',
             options:{
-                 handler:controllers.userGetBookingWithId
+                 description:'Filter Booking With User Id',
+                 handler:controllers.userGetBookingWithId,
+                 tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/user/getBooking/{from_date}/{to_date}',
             options:{
-                 handler:controllers.userBookingWithFilteredDate
+                 description:'Filter Booking Between Dates',
+                 handler:controllers.userBookingWithFilteredDate,
+                 tags:['api']
             }
         }),
         server.route({
             method:'POST',
             path:'/driver/signup',
             options:{
-                 handler:driverControllers.driverSignUp
+                 description:'Driver SignUp Api',
+                 handler:driverControllers.driverSignUp,
+                 tags:['api']
             }
         }),
         server.route({
             method:'POST',
             path:'/driver/signin',
             options:{
-                  handler:driverControllers.driverSignIn
+                  description:'Driver SignIn Api',
+                  handler:driverControllers.driverSignIn,
+                  tags:['api']
             }
         }),
         server.route({
             method:'POST',
             path:'/driver/confirmOrRejectBooking',
             options:{
-                  handler:driverControllers.driverConfirmRejectBookings
+                  description:'Driver Confirm Booking',
+                  handler:driverControllers.driverConfirmRejectBookings,
+                  tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/admin/getBookings',
             options:{
-                handler:adminControllers.adminGetBookings
+                description:'Get Booking Api',
+                handler:adminControllers.adminGetBookings,
+                tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/admin/getBookings/{user_id}',
             options:{
-                 handler:adminControllers.adminGetBookingsWithUserId
+                 description:'Filter Booking By Id',
+                 handler:adminControllers.adminGetBookingsWithUserId,
+                 tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/admin/getBookings/{from_date}/{to_date}',
             options:{
-                   handler:adminControllers.adminGetBookingsWithDateFilter
+                   description:'Filter Booking By Date',
+                   handler:adminControllers.adminGetBookingsWithDateFilter,
+                   tags:['api']
             }
         }),
         server.route({
             method:'GET',
             path:'/admin/freeDrivers',
             options:{
-                    handler:adminControllers.getFreeDrivers
+                    description:'Free Driver Api',
+                    handler:adminControllers.getFreeDrivers,
+                    tags:['api']
             }
         }),
         server.route({
             method:'PUT',
             path:'/admin/assignDrivers/{booking_id}',
             options:{
-                    handler:adminControllers.assignDrivers
+                    description:'Assign Drivers Api',
+                    handler:adminControllers.assignDrivers,
+                    tags:['api']
             }
         })
 

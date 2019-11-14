@@ -23,7 +23,7 @@ exports.plugin={
                 //                 email:Joi.string().email().required().trim().lowercase(),
                 //                 phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
                 //                 password:Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/).min(6).required()
-                //             }).label('User')
+                //             }).label('api')
                 // }
                 
             }

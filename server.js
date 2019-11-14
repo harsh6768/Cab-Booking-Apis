@@ -11,20 +11,20 @@ admin.createAdmin();
 
 const port = process.env.port || 5000;
 
-const server = new Hapi.Server({
-  host: "localhost",
-  port
-});
-
-//swagger documentation options
-const swaggerOptions = {
-  info: {
-    title: "Test API Documentation",
-    version: "0.0.1"
-  }
-};
-
 const init=async()=>{
+
+    const server = await new Hapi.Server({
+      host: "localhost",
+      port
+    });
+    
+    //swagger documentation options
+    const swaggerOptions = {
+      info: {
+        title: "Test API Documentation",
+        version: "0.0.1"
+      }
+    };
     //register dependencies
     await server.register([
       Inert,

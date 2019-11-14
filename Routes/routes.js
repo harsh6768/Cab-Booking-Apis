@@ -1,6 +1,7 @@
-var controllers=require('../Controller/controllers');
-var driverControllers=require('../Controller/driverControllers');
-var adminControllers=require('../Controller/adminControllers');
+const  Joi                          =       require('@hapi/joi');
+const  controllers                  =       require('../Controller/controllers');
+const  driverControllers            =       require('../Controller/driverControllers');
+const  adminControllers             =       require('../Controller/adminControllers');
 
 exports.plugin={
     register:(server,options,next)=>{
@@ -12,7 +13,19 @@ exports.plugin={
                 description:'User SignUp Api',
                 notes:'signup with valid phone number',
                 handler:controllers.userSignUp,
-                tags:['api']
+                tags:['api','user'],
+                // validate:{
+                    
+                //     payload:
+
+                //             Joi.object({
+                //                 name:Joi.string().min(3).required().trim(),
+                //                 email:Joi.string().email().required().trim().lowercase(),
+                //                 phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
+                //                 password:Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/).min(6).required()
+                //             }).label('User')
+                // }
+                
             }
         }),
         server.route({
@@ -22,7 +35,7 @@ exports.plugin={
                  description:'User SignIn Api',
                  notes:'provide valid credentials',
                  handler:controllers.userSignIn,
-                 tags:['api']
+                 tags:['api','user']
             }
         }),
         server.route({
@@ -31,7 +44,7 @@ exports.plugin={
             options:{
                  description:'Create Booking Api',
                  handler:controllers.userCreateBooking,
-                 tags:['api']
+                 tags:['api','user']
             }
         }),
         server.route({
@@ -40,7 +53,7 @@ exports.plugin={
             options:{
                 description:'Get All Booking Details Api',
                 handler:controllers.userGetBookings,
-                tags:['api']
+                tags:['api','user']
             }
         }),
         server.route({
@@ -49,7 +62,7 @@ exports.plugin={
             options:{
                  description:'Filter Booking With User Id',
                  handler:controllers.userGetBookingWithId,
-                 tags:['api']
+                 tags:['api','user']
             }
         }),
         server.route({
@@ -58,7 +71,7 @@ exports.plugin={
             options:{
                  description:'Filter Booking Between Dates',
                  handler:controllers.userBookingWithFilteredDate,
-                 tags:['api']
+                 tags:['api','user']
             }
         }),
         server.route({
@@ -67,7 +80,7 @@ exports.plugin={
             options:{
                  description:'Driver SignUp Api',
                  handler:driverControllers.driverSignUp,
-                 tags:['api']
+                 tags:['api','driver']
             }
         }),
         server.route({
@@ -76,7 +89,7 @@ exports.plugin={
             options:{
                   description:'Driver SignIn Api',
                   handler:driverControllers.driverSignIn,
-                  tags:['api']
+                  tags:['api','driver']
             }
         }),
         server.route({
@@ -85,7 +98,7 @@ exports.plugin={
             options:{
                   description:'Driver Confirm Booking',
                   handler:driverControllers.driverConfirmRejectBookings,
-                  tags:['api']
+                  tags:['api','driver']
             }
         }),
         server.route({
@@ -94,7 +107,7 @@ exports.plugin={
             options:{
                 description:'Get Booking Api',
                 handler:adminControllers.adminGetBookings,
-                tags:['api']
+                tags:['api','admin']
             }
         }),
         server.route({
@@ -103,7 +116,7 @@ exports.plugin={
             options:{
                  description:'Filter Booking By Id',
                  handler:adminControllers.adminGetBookingsWithUserId,
-                 tags:['api']
+                 tags:['api','admin']
             }
         }),
         server.route({
@@ -112,7 +125,7 @@ exports.plugin={
             options:{
                    description:'Filter Booking By Date',
                    handler:adminControllers.adminGetBookingsWithDateFilter,
-                   tags:['api']
+                   tags:['api','admin']
             }
         }),
         server.route({
@@ -121,7 +134,7 @@ exports.plugin={
             options:{
                     description:'Free Driver Api',
                     handler:adminControllers.getFreeDrivers,
-                    tags:['api']
+                    tags:['api','admin']
             }
         }),
         server.route({
@@ -130,7 +143,7 @@ exports.plugin={
             options:{
                     description:'Assign Drivers Api',
                     handler:adminControllers.assignDrivers,
-                    tags:['api']
+                    tags:['api','admin']
             }
         })
 

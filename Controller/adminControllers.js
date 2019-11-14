@@ -139,7 +139,7 @@ let getFreeDrivers=async(request,h)=>{
         .catch(err=>reject(
             h.response({
                 status:500,
-                body:[drivers],
+                body:err,
                 message:'Driver details'
             }).code(500)
         ))

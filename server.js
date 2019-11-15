@@ -38,7 +38,7 @@ const init=async()=>{
         plugin:require('./Routes/routes')
       }
     ]);
-    
+
     try {
       await server.start();
       console.log("Server running at:", server.info.uri);

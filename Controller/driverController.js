@@ -1,8 +1,10 @@
-const Bluebird            =       require('bluebird')
-const bcrypt              =       Bluebird.promisifyAll(require('bcrypt'));
-const boom                =       require('@hapi/boom');
-const getAge              =       require('../Utilities/dobToAgeConvert');
-const db                  =       require('../Model/sql.db');
+const Bluebird                  =       require('bluebird')
+const bcrypt                    =       Bluebird.promisifyAll(require('bcrypt'));
+const boom                      =       require('@hapi/boom');
+const getAge                    =       require('../Utilities/dobToAgeConvert');
+const db                        =       require('../Model/sql.db');
+const jwt                       =       require('jsonwebtoken');
+const keys                      =       require('../Config/keys');
 
 let driverSignUp=(request,h)=>{
 
@@ -98,9 +100,15 @@ let driverSignIn=(request,h)=>{
                 bcrypt.compare(password,drivers[0].password)
                 .then(isLogin=>{
                     if(isLogin){
+
+                       //creating jwt token
+                       const auth_token=jwt.sign({id:drivers[0].id},keys.jwt.SECRET_TOKEN);
                        return resolve(
                             h.response({
                                 status:200,
+                                body:{
+                                    auth_token
+                                },
                                 message:'Logged In successfully!!!'
                             }).code(200)
                         )

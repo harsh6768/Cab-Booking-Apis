@@ -1,7 +1,7 @@
-const  Joi                          =       require('joi');
-const  controllers                  =       require('../Controller/controllers');
-const  driverControllers            =       require('../Controller/driverControllers');
-const  adminControllers             =       require('../Controller/adminControllers');
+const  Joi                            =       require('joi');
+const  userController                 =       require('../Controller/userController');
+const  driverController               =       require('../Controller/driverController');
+const  adminController                =       require('../Controller/adminController');
 
 exports.plugin={
     register:(server,options,next)=>{
@@ -12,7 +12,7 @@ exports.plugin={
             options:{
                 description:'User SignUp Api',
                 notes:'signup with valid phone number',
-                handler:controllers.userSignUp,
+                handler:userController.userSignUp,
                 tags:['api','user'],
                 validate:{
                     
@@ -34,7 +34,7 @@ exports.plugin={
             options:{
                  description:'User SignIn Api',
                  notes:'provide valid credentials',
-                 handler:controllers.userSignIn,
+                 handler:userController.userSignIn,
                  tags:['api','user'],
                  validate:{
                      payload:{
@@ -49,7 +49,7 @@ exports.plugin={
             path:'/user/createBooking',
             options:{
                  description:'Create Booking Api',
-                 handler:controllers.userCreateBooking,
+                 handler:userController.userCreateBooking,
                  tags:['api','user'],
                  validate:{
                      payload:
@@ -67,7 +67,7 @@ exports.plugin={
             path:'/user/getBookings',
             options:{
                 description:'Get All Booking Details Api',
-                handler:controllers.userGetBookings,
+                handler:userController.userGetBookings,
                 tags:['api','user']
             }
         }),
@@ -76,7 +76,7 @@ exports.plugin={
             path:'/user/getBooking/{user_id}',
             options:{
                  description:'Filter Booking With User Id',
-                 handler:controllers.userGetBookingWithId,
+                 handler:userController.userGetBookingWithId,
                  tags:['api','user'],
                  validate:{
                      params:{
@@ -90,7 +90,7 @@ exports.plugin={
             path:'/user/getBooking/{from_date}/{to_date}',
             options:{
                  description:'Filter Booking Between Dates',
-                 handler:controllers.userBookingWithFilteredDate,
+                 handler:userController.userBookingWithFilteredDate,
                  tags:['api','user'],
                  validate:{
                      params:{
@@ -105,7 +105,7 @@ exports.plugin={
             path:'/driver/signup',
             options:{
                  description:'Driver SignUp Api',
-                 handler:driverControllers.driverSignUp,
+                 handler:driverController.driverSignUp,
                  tags:['api','driver'],
                  validate:{
                     
@@ -127,7 +127,7 @@ exports.plugin={
             path:'/driver/signin',
             options:{
                   description:'Driver SignIn Api',
-                  handler:driverControllers.driverSignIn,
+                  handler:driverController.driverSignIn,
                   tags:['api','driver'],
                   validate:{
                     payload:{
@@ -142,7 +142,7 @@ exports.plugin={
             path:'/driver/confirmOrRejectBooking',
             options:{
                   description:'Driver Confirm Booking',
-                  handler:driverControllers.driverConfirmRejectBookings,
+                  handler:driverController.driverConfirmRejectBookings,
                   tags:['api','driver']
             }
         }),
@@ -151,7 +151,7 @@ exports.plugin={
             path:'/admin/getBookings',
             options:{
                 description:'Get Booking Api',
-                handler:adminControllers.adminGetBookings,
+                handler:adminController.adminGetBookings,
                 tags:['api','admin']
             }
         }),
@@ -160,7 +160,7 @@ exports.plugin={
             path:'/admin/getBookings/{user_id}',
             options:{
                  description:'Filter Booking By Id',
-                 handler:adminControllers.adminGetBookingsWithUserId,
+                 handler:adminController.adminGetBookingsWithUserId,
                  tags:['api','admin'],
                  validate:{
                     params:{
@@ -174,7 +174,7 @@ exports.plugin={
             path:'/admin/getBookings/{from_date}/{to_date}',
             options:{
                    description:'Filter Booking By Date',
-                   handler:adminControllers.adminGetBookingsWithDateFilter,
+                   handler:adminController.adminGetBookingsWithDateFilter,
                    tags:['api','admin'],
                    validate:{
                     params:{
@@ -189,7 +189,7 @@ exports.plugin={
             path:'/admin/freeDrivers',
             options:{
                     description:'Free Driver Api',
-                    handler:adminControllers.getFreeDrivers,
+                    handler:adminController.getFreeDrivers,
                     tags:['api','admin']
             }
         }),
@@ -198,7 +198,7 @@ exports.plugin={
             path:'/admin/assignDrivers/{booking_id}',
             options:{
                     description:'Assign Drivers Api',
-                    handler:adminControllers.assignDrivers,
+                    handler:adminController.assignDrivers,
                     tags:['api','admin'],
                     validate:{
                         params:{

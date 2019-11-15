@@ -1,9 +1,11 @@
-const Bluebird              =   require('bluebird');
-const boom                  =   require('@hapi/boom');
-const db                    =   require('../Model/sql.db');
-const Log                   =   require('../Model/db.logs');
-const bcrypt                =   Bluebird.promisifyAll(require('bcrypt'));
-const validate              =   require('../Controller/validateDate') //to validate the date
+const Bluebird                  =      require('bluebird');
+const boom                      =      require('@hapi/boom');
+const db                        =      require('../Model/sql.db');
+const Log                       =      require('../Model/db.logs');
+const bcrypt                    =      Bluebird.promisifyAll(require('bcrypt'));
+const validate                  =      require('./validateDate') //to validate the date
+const jwt                       =      require('jsonwebtoken');
+const keys                      =      require('../Config/keys');
 
 let userSignUp=(request,h)=>{
     
@@ -52,7 +54,7 @@ let userSignUp=(request,h)=>{
                     return reject(
                         h.response({
                             status:500,
-                            body:err.message,
+                            body:err,
                             message:'Internal server error'
                         }).code(500)
                     )
@@ -94,9 +96,14 @@ let userSignIn=(request,h)=>{
                     console.log(`----------------------->>>>>>>>>>>>>>`,isLogin);
                     if(isLogin){
         
+                        //creating jwt token
+                        const auth_token=jwt.sign({id:user.id},keys.jwt.SECRET_TOKEN);
                         return resolve(
                             h.response({
                                 status:200,
+                                body:{
+                                    auth_token
+                                },
                                 message:'Logged In successfully!!!'
                             }).code(200)
                         )

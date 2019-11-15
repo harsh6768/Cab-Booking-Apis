@@ -3,8 +3,8 @@ const Inert                       =       require("@hapi/inert");
 const Good                        =       require("@hapi/good");
 const Vision                      =       require("@hapi/vision");
 const HapiSwagger                 =       require("hapi-swagger");
-const admin                       =       require("./Model/admin");
-const mongoDb                     =       require("./Model/mongo.db");
+const admin                       =       require("./Server/Model/admin");
+const mongoDb                     =       require("./Server/Model/mongo.db");
 
 // //for creating the admin
 admin.createAdmin();
@@ -35,7 +35,7 @@ const init=async()=>{
         options: swaggerOptions
       },
       {
-        plugin:require('./Routes/routes')
+        plugin:require('./Server/Routes/routes')
       }
     ]);
 

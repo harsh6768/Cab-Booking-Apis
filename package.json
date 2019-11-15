@@ -20,7 +20,7 @@
     "good-console": "^6.1.2",
     "good-mongodb": "^0.4.0",
     "good-squeeze": "^4.0.0",
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.5.2",
     "hapi": "^14.0.0",
     "hapi-auth-basic": "^5.0.0",
     "hapi-login": "^1.2.2",

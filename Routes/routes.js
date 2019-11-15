@@ -1,4 +1,4 @@
-const  Joi                          =       require('@hapi/joi');
+const  Joi                          =       require('joi');
 const  controllers                  =       require('../Controller/controllers');
 const  driverControllers            =       require('../Controller/driverControllers');
 const  adminControllers             =       require('../Controller/adminControllers');
@@ -14,17 +14,17 @@ exports.plugin={
                 notes:'signup with valid phone number',
                 handler:controllers.userSignUp,
                 tags:['api','user'],
-                // validate:{
+                validate:{
                     
-                //     payload:
+                    payload:
 
-                //             Joi.object({
-                //                 name:Joi.string().min(3).required().trim(),
-                //                 email:Joi.string().email().required().trim().lowercase(),
-                //                 phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
-                //                 password:Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/).min(6).required()
-                //             }).label('api')
-                // }
+                            Joi.object({
+                                name:Joi.string().min(3).required().trim(),
+                                email:Joi.string().email().required().trim().lowercase(),
+                                phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
+                                password:Joi.string().min(6).required()
+                            }).label('User')
+                }
                 
             }
         }),
@@ -80,7 +80,20 @@ exports.plugin={
             options:{
                  description:'Driver SignUp Api',
                  handler:driverControllers.driverSignUp,
-                 tags:['api','driver']
+                 tags:['api','driver'],
+                 validate:{
+                    
+                    payload:
+
+                            Joi.object({
+                                name:Joi.string().min(3).required().trim(),
+                                email:Joi.string().email().required().trim().lowercase(),
+                                phone:Joi.string().regex(/^[0-9]+$/).min(10).max(10).required(),
+                                dob:Joi.string().optional(),
+                                address:Joi.string().optional(),
+                                password:Joi.string().min(6).required()
+                            }).label('Driver')
+                }
             }
         }),
         server.route({

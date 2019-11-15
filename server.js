@@ -33,20 +33,12 @@ const init=async()=>{
       {
         plugin: HapiSwagger,
         options: swaggerOptions
-      }
-    ]);
-
-    await server.register(
+      },
       {
         plugin:require('./Routes/routes')
-      },
-      {
-        routes:{prefix:'/api/v1'}
-      },
-      (err)=>{
-        if(err){throw err }
       }
-    )
+    ]);
+    
     try {
       await server.start();
       console.log("Server running at:", server.info.uri);

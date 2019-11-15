@@ -242,78 +242,99 @@ let userCreateBooking=(request,h)=>{
 
 let userGetBookings=(request,h)=>{
     
-    
-    var sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
-     from bookings
-     inner join users
-     on bookings.users_fk=users.id`;
-     
-     db.queryAsync(sql)
-     .then(bookings=>h.response({
-            status:200,
-            body:[bookings],
-            message:'Bookings detail'
-       }).code(200)
-     )
-     .catch(err=>h.response({
-             status:500,
-             message:err.message
-         }).code(500)
-     )    
+    return new Promise((resolve,reject)=>{
+
+        let sql=`select users.id,users.name,users.email,users.phone ,bookings.from_place,bookings.to_place,bookings.date_time
+        from bookings
+        inner join users
+        on bookings.users_fk=users.id`;
+        
+        db.queryAsync(sql)
+        .then(bookings=>resolve(
+
+            h.response({
+                status:200,
+                body:[bookings],
+                message:'Bookings detail'
+            }).code(200)
+        ))
+        .catch(err=>reject(
+
+            h.response({
+                status:500,
+                message:err
+            }).code(500)
+        ))  
+            
+    })
+      
 
 }
 
 let userGetBookingWithId=(request,h)=>{
     
-    let userId=request.params.user_id;
-    let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
-       from bookings 
-       inner join users 
-       on bookings.users_fk=users.id 
-       AND bookings.users_fk=?`;
+    return new Promise((resolve,reject)=>{
 
-    db.queryAsync(sql,userId)
-    .then(booking=>{
-        return h.response({
-            status:200,
-            body:booking,
-            message:'Booking details'
-        }).code(200)
+        let userId=request.params.user_id;
+        let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+        from bookings 
+        inner join users 
+        on bookings.users_fk=users.id 
+        AND bookings.users_fk=?`;
+
+        db.queryAsync(sql,userId)
+        .then(booking=>resolve(
+            h.response({
+                status:200,
+                body:booking,
+                message:'Booking details'
+            }).code(200)
+        ))
+        .catch(err=>reject(
+
+            h.response({
+                status:500,
+                body:err.message,
+                message:'Error occured!'
+           }).code(500)
+
+        ))
     })
-    .catch(err=>{
-       return h.response({
-            status:500,
-            body:err.message,
-            message:'Error occured!'
-       }).code(500)
-    })
+    
 }
 
 let userBookingWithFilteredDate=(request,h)=>{
    
-    
-    let from_date=new Date(request.params.from_date);
-    let to_date=new Date(request.params.to_date);
+    return new Promise((resolve,reject)=>{
 
-    let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
-       from bookings 
-       inner join users 
-       on bookings.users_fk=users.id 
-       AND bookings.date_time>=? AND bookings.date_time<=?`;
+        let from_date=new Date(request.params.from_date);
+        let to_date=new Date(request.params.to_date);
 
-    db.queryAsync(sql,[from_date,to_date])
-    .then(bookings=>h.response({
-            status:200,
-            body:[bookings],
-            message:'Bookings details'
-     }).code(200)
-    )  
-    .catch(err=>h.response({
-        status:500,
-        body:err.message,
-        message:'Error error!'
-    }).code(500)
-    )
+        let sql=`select users.id,users.email,users.phone,bookings.from_place,bookings.to_place,bookings.date_time
+        from bookings 
+        inner join users 
+        on bookings.users_fk=users.id 
+        AND bookings.date_time>=? AND bookings.date_time<=?`;
+
+        db.queryAsync(sql,[from_date,to_date])
+        .then(bookings=>resolve(
+
+            h.response({
+                status:200,
+                body:[bookings],
+                message:'Bookings details'
+            }).code(200)
+
+        ))  
+        .catch(err=>reject(
+            h.response({
+                status:500,
+                body:err.message,
+                message:'Error error!'
+            }).code(500)
+        ))
+        
+    })
     
 }
 

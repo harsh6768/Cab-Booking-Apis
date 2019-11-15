@@ -34,8 +34,17 @@ const init=async()=>{
         plugin: HapiSwagger,
         options: swaggerOptions
       },
+      // {
+      //   plugin:require('./Server/Routes/routes')
+      // }
       {
-        plugin:require('./Server/Routes/routes')
+         plugin:require('./Server/Modules/user/index')
+      },
+      {
+         plugin:require('./Server/Modules/admin/index')
+      },
+      {
+        plugin:require('./Server/Modules/driver/index')
       }
     ]);
 

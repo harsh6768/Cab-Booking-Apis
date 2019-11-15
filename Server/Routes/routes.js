@@ -1,7 +1,7 @@
 const  Joi                            =       require('joi');
-const  userController                 =       require('../Controller/userController');
-const  driverController               =       require('../Controller/driverController');
-const  adminController                =       require('../Controller/adminController');
+const  userController                 =       require('../Controller/user-controller');
+const  driverController               =       require('../Controller/driver-controller');
+const  adminController                =       require('../Controller/admin-controller');
 
 exports.plugin={
     register:(server,options,next)=>{

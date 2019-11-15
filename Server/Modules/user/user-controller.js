@@ -1,11 +1,11 @@
 const Bluebird                  =      require('bluebird');
 const boom                      =      require('@hapi/boom');
-const db                        =      require('../Model/sql.db');
-const Log                       =      require('../Model/db.logs');
+const db                        =      require('../../Model/sql.db');
+const Log                       =      require('../../Model/db.logs');
 const bcrypt                    =      Bluebird.promisifyAll(require('bcrypt'));
-const validate                  =      require('./validateDate') //to validate the date
+const validate                  =      require('../../Controller/validateDate') //to validate the date
 const jwt                       =      require('jsonwebtoken');
-const keys                      =      require('../Config/keys');
+const keys                      =      require('../../Config/keys');
 
 let userSignUp=(request,h)=>{
     

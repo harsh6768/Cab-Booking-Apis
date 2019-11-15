@@ -1,10 +1,10 @@
 const Bluebird                  =       require('bluebird')
 const bcrypt                    =       Bluebird.promisifyAll(require('bcrypt'));
 const boom                      =       require('@hapi/boom');
-const getAge                    =       require('../Utilities/dobToAgeConvert');
-const db                        =       require('../Model/sql.db');
+const getAge                    =       require('../../Utilities/dobToAgeConvert');
+const db                        =       require('../../Model/sql.db');
 const jwt                       =       require('jsonwebtoken');
-const keys                      =       require('../Config/keys');
+const keys                      =       require('../../Config/keys');
 
 let driverSignUp=(request,h)=>{
 

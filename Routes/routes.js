@@ -44,7 +44,16 @@ exports.plugin={
             options:{
                  description:'Create Booking Api',
                  handler:controllers.userCreateBooking,
-                 tags:['api','user']
+                 tags:['api','user'],
+                 validate:{
+                     payload:
+                        Joi.object({
+                            from_place:Joi.string().required().trim(),
+                            to_place:Joi.string().required().trim(),
+                            location:Joi.string().required().trim(),
+                            phone:Joi.string().regex(/^[0-9]+$/).min(10).required()
+                        }).label('Booking')
+                 }
             }
         }),
         server.route({
@@ -62,7 +71,12 @@ exports.plugin={
             options:{
                  description:'Filter Booking With User Id',
                  handler:controllers.userGetBookingWithId,
-                 tags:['api','user']
+                 tags:['api','user'],
+                 validate:{
+                     params:{
+                         user_id:Joi.number().required().description('user id')
+                     }
+                 }
             }
         }),
         server.route({
@@ -71,7 +85,13 @@ exports.plugin={
             options:{
                  description:'Filter Booking Between Dates',
                  handler:controllers.userBookingWithFilteredDate,
-                 tags:['api','user']
+                 tags:['api','user'],
+                 validate:{
+                     params:{
+                         from_date:Joi.string().required().trim().description("Starting Date Of Booking"),
+                         to_date:Joi.string().required().trim().description("Ending Date of Booking")
+                     }
+                 }
             }
         }),
         server.route({
@@ -129,7 +149,12 @@ exports.plugin={
             options:{
                  description:'Filter Booking By Id',
                  handler:adminControllers.adminGetBookingsWithUserId,
-                 tags:['api','admin']
+                 tags:['api','admin'],
+                 validate:{
+                    params:{
+                        user_id:Joi.number().required().description('user id')
+                    }
+                }
             }
         }),
         server.route({
@@ -138,7 +163,13 @@ exports.plugin={
             options:{
                    description:'Filter Booking By Date',
                    handler:adminControllers.adminGetBookingsWithDateFilter,
-                   tags:['api','admin']
+                   tags:['api','admin'],
+                   validate:{
+                    params:{
+                        from_date:Joi.string().required().trim().description("Starting Date Of Booking"),
+                        to_date:Joi.string().required().trim().description("Ending Date of Booking")
+                    }
+                }
             }
         }),
         server.route({
@@ -156,7 +187,12 @@ exports.plugin={
             options:{
                     description:'Assign Drivers Api',
                     handler:adminControllers.assignDrivers,
-                    tags:['api','admin']
+                    tags:['api','admin'],
+                    validate:{
+                        params:{
+                            booking_id:Joi.number().required().description('booking id')
+                        }
+                    }
             }
         })
 

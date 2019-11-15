@@ -35,7 +35,13 @@ exports.plugin={
                  description:'User SignIn Api',
                  notes:'provide valid credentials',
                  handler:controllers.userSignIn,
-                 tags:['api','user']
+                 tags:['api','user'],
+                 validate:{
+                     payload:{
+                         phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
+                         password:Joi.string().required()
+                     }
+                 }
             }
         }),
         server.route({
@@ -122,7 +128,13 @@ exports.plugin={
             options:{
                   description:'Driver SignIn Api',
                   handler:driverControllers.driverSignIn,
-                  tags:['api','driver']
+                  tags:['api','driver'],
+                  validate:{
+                    payload:{
+                        phone:Joi.string().regex(/^[0-9]+$/).min(10).required(),
+                        password:Joi.string().required()
+                    }
+                }
             }
         }),
         server.route({

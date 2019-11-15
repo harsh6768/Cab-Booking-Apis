@@ -1,5 +1,5 @@
 let  boom               =       require('@hapi/boom');
-let db                  =       require('../../Model/sql.db');
+let db                  =       require('../../model/sql.db');
 
 let adminGetBookings=(request,h)=>{
 

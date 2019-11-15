@@ -1,8 +1,8 @@
 const Inert                     =       require('@hapi/inert');
 const Vision                    =       require('@hapi/vision');
 const HapiSwagger               =       require('hapi-swagger');
-const mongoDb                   =       require('./Model/mongo.db');
-const admin                     =       require('./Model/admin');
+const mongoDb                   =       require('./model/mongo.db');
+const admin                     =       require('./model/admin');
 
 //creat admin
 admin.createAdmin();

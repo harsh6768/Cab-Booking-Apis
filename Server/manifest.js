@@ -1,8 +1,8 @@
 const Inert                     =       require('@hapi/inert');
 const Vision                    =       require('@hapi/vision');
 const HapiSwagger               =       require('hapi-swagger');
-const mongoDb                   =       require('./model/mongo.db');
 const Blipp                     =       require('blipp');
+const Good                      =       require("@hapi/good");
 const admin                     =       require('./model/admin');
 
 //creat admin
@@ -31,6 +31,28 @@ const manifest = {
                 Blipp,
                 Inert,
                 Vision,
+                {
+                    plugin:Good,
+                    options: {
+                        ops: {
+                            interval: 1000
+                        },
+                        reporters: {
+                            myConsoleReporter: [
+                                {
+                                    module: '@hapi/good-squeeze',
+                                    name: 'Squeeze',
+                                    args: [{ log: '*', response: '*' }]
+                                    // args: [{ log: '*', response: '*', ops: '*' }]
+                                },
+                                {
+                                    module: '@hapi/good-console'
+                                },
+                                'stdout'
+                            ]
+                        }
+                    }
+                },
                 {
                     plugin: HapiSwagger,
                     options: swaggerOptions

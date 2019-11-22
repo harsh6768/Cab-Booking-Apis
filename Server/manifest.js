@@ -2,6 +2,7 @@ const Inert                     =       require('@hapi/inert');
 const Vision                    =       require('@hapi/vision');
 const HapiSwagger               =       require('hapi-swagger');
 const mongoDb                   =       require('./model/mongo.db');
+const Blipp                     =       require('blipp');
 const admin                     =       require('./model/admin');
 
 //creat admin
@@ -27,6 +28,7 @@ const manifest = {
     },
     register: {
         plugins: [
+                Blipp,
                 Inert,
                 Vision,
                 {

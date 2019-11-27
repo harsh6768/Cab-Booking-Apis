@@ -4,7 +4,7 @@ const MYSQL             =   require('mysql');
 let con= MYSQL.createConnection({
     host:"localhost",
     user:"root",
-    password:"",
+    password:"786Hh@786",
     database:"uber_test",
 });
 

@@ -1,5 +1,5 @@
 module.exports={
     jwt:{
-        SECRET_TOKEN:'harshchaurasiya6768@gmail.com'
+        SECRET_TOKEN:process.env.SECRET_TOKEN
     }
 }

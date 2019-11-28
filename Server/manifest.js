@@ -24,7 +24,7 @@ const swaggerOptions = {
 
 const manifest = {
     server: {
-        port: 5000
+        port: process.env.PORT
     },
     register: {
         plugins: [

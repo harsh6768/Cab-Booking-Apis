@@ -1,5 +1,5 @@
 const Bluebird           =   require('bluebird');  
-const MYSQL             =   require('mysql');
+const MYSQL              =   require('mysql');
 
 let con= MYSQL.createConnection({
     host:"localhost",

@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/boom": "^8.0.1",
+    "@hapi/catbox": "^11.0.0",
+    "@hapi/catbox-redis": "^5.0.5",
     "@hapi/glue": "^6.2.0",
     "@hapi/good": "^8.2.4",
     "@hapi/good-console": "^8.1.2",
